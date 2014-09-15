@@ -1,0 +1,10 @@
+{
+  "name": "webinar",
+  "version": "1.0.0",
+  "main": "index.html",
+  "dependencies": {
+    "threestrap": "~0.0.7",
+    "threejs": "*"
+  },
+  "devDependencies": {}
+}
