@@ -1,8 +1,7 @@
 var SnowScene = function (res, size, snow) {
 	var three = THREE.Bootstrap('core', 'stats');
 	three.renderer.shadowMapEnabled = true;
-	three.renderer.shadowMapSoft = true;
-	three.renderer.antialias = true;
+	three.renderer.shadowMapType = THREE.PCFSoftShadowMap;
 	three.renderer.setClearColor(0x808080, 1);
 
 	three.camera.far = 1e6;
