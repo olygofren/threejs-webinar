@@ -3,11 +3,15 @@ var SnowScene = function (res, size, snow) {
 	three.renderer.shadowMapEnabled = true;
 	three.renderer.shadowMapType = THREE.PCFSoftShadowMap;
 	three.renderer.setClearColor(0x808080, 1);
+	// TODO: instead of uniform gray background, implement skybox as in
+	// http://danni-three.blogspot.com/2013/09/threejs-skybox.html
 
 	three.camera.far = 1e6;
 	three.camera.updateProjectionMatrix();
 
 	three.scene.fog = new THREE.FogExp2(0xaaaaaa, 1 / size);
+	// TODO: implement more dramatic "volumetric" fog as in
+	// http://mrdoob.com/lab/javascript/webgl/clouds/
 
 	this.res = res;
 	this.size = size;
@@ -50,13 +54,13 @@ SnowScene.prototype.setupLights = function () {
 SnowScene.prototype.generateTerrain = function () {
 	var generator = new MidpointDisplacementMapGenerator(this.res + 1, 1.9);
 	this.heightData = generator.generate(this.size * this.verticalScale);
+	// TODO: explore better procedural terrain generation options
 
 	this.terrainGeometry = new THREE.PlaneGeometry(this.size, this.size, this.res, this.res);
 
 	var index = 0;
 	for (var i = 0; i <= this.res; i++) {
 		for (var j = 0; j <= this.res; j++) {
-			// this.heightData[i][j] = 0;
 			this.terrainGeometry.vertices[index++].z = this.heightData[i][j];
 		}
 	}
@@ -74,9 +78,12 @@ SnowScene.prototype.setupMaterials = function () {
 
 	this.planeMaterial = new THREE.MeshLambertMaterial({
 		map: texture,
+		// TODO: add terrain normal map & bump map for more detail
 		shading: THREE.SmoothShading,
 		ambient: 0x404040
 	});
+	// TODO: implement height-based blending shader material as in
+	// https://stemkoski.github.io/Three.js/Shader-Heightmap-Textures.html
 
 	var canvas = document.createElement('canvas');
 	canvas.width = canvas.height = this.res;
@@ -92,6 +99,8 @@ SnowScene.prototype.setupMaterials = function () {
 		shading: THREE.SmoothShading,
 		transparent: true
 	});
+	// TODO: update bump/normal map/geometry as the ray melts the snow as in
+	// http://christmasexperiments.com/2013/21/
 
 	this.rayMaterial = new THREE.ShaderMaterial({
 		uniforms: {
@@ -129,6 +138,8 @@ SnowScene.prototype.setupPointCloud = function (snow) {
 		map: THREE.ImageUtils.loadTexture('snowflake.png'),
 		size: 1
 	});
+	// TODO: implement better snow particle shader as in
+	// http://oos.moxiecode.com/js_webgl/snowfall/
 
 	for (var p = 0; p < snow; p++) {
 		var pX = (Math.random() - 0.5) * this.size;
@@ -165,11 +176,14 @@ SnowScene.prototype.update = function () {
 		(elevation + this.heightData[coords.y][coords.x] + 15 * current) / 16;
 
 	this.camera.lookAt(new THREE.Vector3());
+	// TODO: add manual camera control if you wish
+	// https://github.com/mrdoob/three.js/tree/master/examples/js/controls
 
 	var updateSnow = false;
 	for (var i = 0; i < this.snowflakes.geometry.vertices.length; i++) {
 		var snowflake = this.snowflakes.geometry.vertices[i];
 		snowflake.y -= Math.random();
+		// TODO: implement better wind/gravity model, rotate/scale snowflakes
 		coords = this.globalCoordsToTextureCoords(snowflake);
 		if (snowflake.y < this.heightData[coords.y][coords.x]) {
 			this.updateSnow(coords.x, coords.y);
@@ -216,6 +230,8 @@ SnowScene.prototype.setupEventHandlers = function () {
 			$this.renderer.domElement.style.cursor = 'default';
 		}
 	};
+
+	// TODO: implement lightning bolt on right click?
 }
 
 var projector = new THREE.Projector();
@@ -232,6 +248,8 @@ SnowScene.prototype.intersect = function(event) {
 	);
 
 	var intersects = ray.intersectObjects([ this.snow ]);
+	// TODO: this is linear by the number of triangles in the scene
+	// implement tree-based partitioning and use it for intersections
 	if (intersects.length > 0) {
 		return intersects[0].point;
 	}
@@ -277,6 +295,10 @@ SnowScene.prototype.updateRay = function (target) {
 
 	this.burnRay.matrix = new THREE.Matrix4();
 	this.burnRay.applyMatrix(orientation);
+
+	// TODO: use particle system/shader to display some smoke/vapor on intersection as in
+	// https://jeromeetienne.github.io/fireworks.js/examples/smoke/webgl_blacksmoke.html
+	// and http://inear.se/fireshader/
 }
 
 SnowScene.prototype.burn = function (event) {

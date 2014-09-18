@@ -18,6 +18,7 @@
 		void main() {
 			vUv = uv;
 			gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+			// TODO: make vertices jiggle around a la Quake lightning gun
 		}
 	</script>
 	<script id="fragment" type="x-shader/x-fragment">
@@ -35,6 +36,7 @@
 			vec4 color = texture2D(uRay, vec2(x, y));
 			color.w = min(color.x, color.y);
 			gl_FragColor = color;
+			// TODO: add some glow around the ray
 		}
 	</script>
 </body>
